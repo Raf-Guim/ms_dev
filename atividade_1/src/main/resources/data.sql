@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS tab_usuario;
+CREATE TABLE tab_usuario (
+  id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(30) NOT NULL,
+  senha VARCHAR(10) NOT NULL,
+  total_logins INT DEFAULT 0 NOT NULL,
+  total_falhas INT DEFAULT 0 NOT NULL,
+  bloqueado BOOLEAN DEFAULT FALSE NOT NULL
+);
+COMMIT;
