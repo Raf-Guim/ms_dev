@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -150,5 +152,26 @@ public class Usuario {
     userExists.setTotal_logins(0);
     dao.save(userExists);
     return new ResponseEntity<String>("Senha alterada", HttpStatus.OK);
+  }
+
+  @PostMapping("/desbloquear/{username}")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<String> unblock(@PathVariable String username) {
+    System.out.println("TO AQUI PORRA!");
+    if (username == null) {
+      return new ResponseEntity<String>("Usuário não pode ser nulo", HttpStatus.BAD_REQUEST);
+    }
+    UsuarioBean user = dao.findByUsername(username);
+    System.out.println(user);
+    if (user == null) {
+      return new ResponseEntity<String>("Usuário não existe", HttpStatus.NOT_FOUND);
+    }
+    if (!user.isBloqueado()) {
+      return new ResponseEntity<String>("Usuário não está bloqueado", HttpStatus.BAD_REQUEST);
+    }
+    user.setTotal_falhas(0);
+    user.setBloqueado(false);
+    dao.save(user);
+    return new ResponseEntity<String>("Usuário desbloqueado", HttpStatus.OK);
   }
 }
